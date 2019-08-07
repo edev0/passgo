@@ -19,6 +19,8 @@ import (
 
 const (
 	PASSGODIR = "PASSGODIR"
+	// PassDirName is the default name forthe passgo directory, holding all passgo data.
+	PassDirName = ".passgo"
 	// ConfigFileName is the name of the passgo config file.
 	ConfigFileName = "config"
 	// SiteFileName is the name of the passgo password store file.
@@ -81,19 +83,25 @@ func PassFileDirExists() (bool, error) {
 // PassDirExists is used to determine if the passgo
 // directory in the user's home directory exists.
 func PassDirExists() (bool, error) {
-	d, err := GetPassDir()
+	return dirExists(PassDirName)
+}
+
+// dirExists is used to determine if the provided
+// directory in the user's home directory exists.
+func dirExists(dirName string) (bool, error) {
+	d, err := getDir(dirName)
 	if err != nil {
 		return false, err
 	}
 	dirInfo, err := os.Stat(d)
 	if err == nil {
 		if !dirInfo.IsDir() {
-			return true, nil
+			return true, fmt.Errorf("a file already exists at %s. Rename this file or set the %s environment variable", d, PASSGODIR)
 		}
-	} else {
-		if os.IsNotExist(err) {
-			return false, nil
-		}
+		return true, nil
+	}
+	if os.IsNotExist(err) {
+		return false, nil
 	}
 	return false, err
 }
@@ -127,7 +135,8 @@ func SitesVaultExists() (bool, error) {
 	return true, nil
 }
 
-func GetHomeDir() (d string, err error) {
+// getHomeDir returns the current user's home directory.
+func getHomeDir() (d string, err error) {
 	usr, err := user.Current()
 	if err == nil {
 		d = usr.HomeDir
@@ -137,11 +146,16 @@ func GetHomeDir() (d string, err error) {
 
 // GetPassDir is used to return the user's passgo directory.
 func GetPassDir() (d string, err error) {
+	return getDir(PassDirName)
+}
+
+// getDir is used to return the user's passgo directory.
+func getDir(dirName string) (d string, err error) {
 	d, ok := os.LookupEnv(PASSGODIR)
 	if !ok {
-		home, err := GetHomeDir()
+		home, err := getHomeDir()
 		if err == nil {
-			d = filepath.Join(home, ".passgo")
+			d = filepath.Join(home, dirName)
 		}
 	}
 	return
@@ -175,6 +189,7 @@ func GetSitesFile() (d string, err error) {
 	return
 }
 
+// AddFile ... TODO
 func (s *SiteInfo) AddFile(fileBytes []byte, filename string) error {
 	encFileDir, err := GetEncryptedFilesDir()
 	if err != nil {
