@@ -22,7 +22,7 @@ func TestGeneratePassword(t *testing.T) {
 		t.Fatalf("Could not generate password: %s", err)
 	}
 	if len(pass) == 0 {
-		t.Fatalf("Bad length of password. Should never be 0")
+		t.Fatal("Bad length of password. Should never be 0")
 	}
 }
 
@@ -35,7 +35,7 @@ func TestGenerateImpossiblePassword(t *testing.T) {
 	}
 	_, err := GeneratePassword(ps, 3)
 	if err == nil {
-		t.Fatalf("Impossible password request did not throw an error")
+		t.Fatal("Impossible password request did not throw an error")
 	}
 }
 
@@ -51,6 +51,6 @@ func TestGenerateShortPassword(t *testing.T) {
 		t.Fatalf("Could not generate password: %s", err)
 	}
 	if len(pass) != 4 {
-		t.Fatalf("Bad length of password. Should be 4")
+		t.Fatalf("Bad length of password. Should be 4. Have: %d", len(pass))
 	}
 }

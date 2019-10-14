@@ -54,11 +54,12 @@ directory, and initialize your cryptographic keys.`,
 	insertCmd = &cobra.Command{
 		Use:     "insert",
 		Short:   "Insert a file or password in to your vault",
-		Example: "passgo insert money/bank.com",
+		Example: "passgo insert money/bank.com <filename>",
 		Args:    cobra.RangeArgs(1, 2),
 		Long: `Add a site to your password store. This site can optionally be a part
 of a group by prepending a group name and slash to the site name.
-Will prompt for confirmation when a site path is not unique.`,
+Will prompt for confirmation when a site path is not unique.
+Optionally specify a filename after the site name to store a file instead of a password.`,
 		Run: func(cmd *cobra.Command, args []string) {
 			if len(args) == 2 {
 				path := args[0]

@@ -33,6 +33,8 @@ func Init() {
 				hasVault = true
 			}
 		}
+	} else {
+		log.Fatalf("Failed to initialize pass dir: %v", err)
 	}
 
 	passDir, err := pio.GetPassDir()
